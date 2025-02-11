@@ -43,11 +43,14 @@ function updateCartCount() {
 }
 
 // Display Cart Items
+// Display Cart Items and Handle Checkout Button
 function displayCart() {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     let cartItems = document.getElementById("cart-items");
     let total = 0;
     let checkoutButton = document.getElementById("checkout-button");
+    let checkoutButtonText = document.getElementById("checkout-button-text");
+    let checkoutSpinner = document.getElementById("checkout-spinner");
 
     if (!cartItems || !checkoutButton) return;
 
@@ -72,7 +75,23 @@ function displayCart() {
     });
 
     document.getElementById("total-price").innerText = total.toFixed(2);
+
+    // Add Event Listener to Proceed to Checkout Button
+    checkoutButton.addEventListener("click", function(event) {
+        event.preventDefault(); // Prevent immediate navigation
+
+        // Show Spinner & Disable Button
+        checkoutButtonText.innerText = "Processing...";
+        checkoutSpinner.classList.remove("d-none");
+        checkoutButton.classList.add("disabled");
+
+        // Simulate Delay before Redirecting
+        setTimeout(() => {
+            window.location.href = "checkout.html";
+        }, 1500);
+    });
 }
+
 
 // Remove from Cart
 function removeFromCart(index) {
@@ -131,7 +150,7 @@ function generateRandomCVV() {
 }
 
 
-// Fake Payment Processing
+// Fake Payment Processing with Spinner
 function processPayment() {
     let fullName = document.getElementById("full-name").value;
     let email = document.getElementById("email").value;
@@ -145,25 +164,40 @@ function processPayment() {
         return;
     }
 
+    // Disable Button & Show Spinner
+    let payButton = document.getElementById("pay-button");
+    let payButtonText = document.getElementById("pay-button-text");
+    let spinner = document.getElementById("spinner");
+
+    payButton.disabled = true;
+    payButtonText.innerText = "Processing...";
+    spinner.classList.remove("d-none");
+
     // Simulating Payment Processing Delay
     setTimeout(() => {
         // Generate Random Order Number
         let orderNumber = "GD" + Math.floor(Math.random() * 1000000);
 
-        // Show Confirmation Section
+        // Hide Payment Section, Show Confirmation
         document.getElementById("order-number").innerText = orderNumber;
         document.getElementById("confirm-name").innerText = fullName;
         document.getElementById("confirm-email").innerText = email;
         document.getElementById("confirm-address").innerText = address;
         document.getElementById("confirm-total").innerText = document.getElementById("checkout-total-price").innerText;
 
-        // Hide Payment Section, Show Confirmation
         document.getElementById("payment-section").classList.add("d-none");
         document.getElementById("confirmation-section").classList.remove("d-none");
 
         // Clear Cart & Update Count
         localStorage.removeItem("cart");
         updateCartCount();
+
+        // Reset Pay Button
+        payButton.disabled = false;
+        payButtonText.innerText = "Pay Now";
+        spinner.classList.add("d-none");
+
     }, 1500);
 }
+
 
