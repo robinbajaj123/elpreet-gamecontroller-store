@@ -47,10 +47,21 @@ function displayCart() {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     let cartItems = document.getElementById("cart-items");
     let total = 0;
+    let checkoutButton = document.getElementById("checkout-button");
 
-    if (!cartItems) return;
+    if (!cartItems || !checkoutButton) return;
 
     cartItems.innerHTML = "";
+
+    if (cart.length === 0) {
+        cartItems.innerHTML = `<tr><td colspan="3" class="text-center text-muted">Your cart is empty.</td></tr>`;
+        document.getElementById("total-price").innerText = "0.00";
+        checkoutButton.style.display = "none"; // Hide checkout button if cart is empty
+        return;
+    }
+
+    checkoutButton.style.display = "block"; // Show checkout button if cart has items
+
     cart.forEach((item, index) => {
         total += item.price;
         cartItems.innerHTML += `<tr>
@@ -73,7 +84,8 @@ function removeFromCart(index) {
 }
 
 
-// Display Checkout Items
+
+// Display Checkout Items & Auto-Fill Payment Form
 function displayCheckout() {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     let checkoutItems = document.getElementById("checkout-items");
@@ -91,7 +103,33 @@ function displayCheckout() {
     });
 
     document.getElementById("checkout-total-price").innerText = total.toFixed(2);
+
+    // Auto-Fill Payment Details
+    document.getElementById("full-name").value = "John Doe";
+    document.getElementById("email").value = "johndoe@example.com";
+    document.getElementById("address").value = "123 Main St, New York, NY";
+    document.getElementById("card-number").value = generateRandomCardNumber();
+    document.getElementById("expiry").value = generateRandomExpiry();
+    document.getElementById("cvv").value = generateRandomCVV();
 }
+
+// Generate Random Card Number
+function generateRandomCardNumber() {
+    return "4" + Math.floor(1000000000000000 + Math.random() * 900000000000000);
+}
+
+// Generate Random Expiry Date (MM/YY format)
+function generateRandomExpiry() {
+    let month = String(Math.floor(Math.random() * 12) + 1).padStart(2, "0");
+    let year = String(new Date().getFullYear() + Math.floor(Math.random() * 5)).slice(-2);
+    return `${month}/${year}`;
+}
+
+// Generate Random CVV
+function generateRandomCVV() {
+    return Math.floor(100 + Math.random() * 900).toString();
+}
+
 
 // Fake Payment Processing
 function processPayment() {
